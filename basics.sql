@@ -1,3 +1,40 @@
+USE sql_store;
+SELECT *
+FROM customers
+WHERE first_name REGEXP 'elka|ambur'
+
+USE sql_store;
+SELECT *
+FROM customers
+WHERE last_name REGEXP 'ey$|on$'
+
+USE sql_store;
+SELECT *
+FROM customers
+WHERE last_name REGEXP '^my|^se'
+
+USE sql_store;
+SELECT *
+FROM customers
+WHERE last_name REGEXP 'b[ru]'
+
+
+SELECT *
+FROM accounts
+WHERE (name LIKE 'C%' OR name LIKE 'W%')
+  AND (primary_poc LIKE '%ana%' OR  primary_poc LIKE '%Ana%' )
+  AND  primary_poc NOT LIKE '%eana%'
+
+SELECT *
+FROM orders
+WHERE standard_qty = 0
+  AND (gloss_qty > 1000 OR poster_qty > 1000)
+
+SELECT *
+FROM orders
+WHERE gloss_qty > 4000 OR poster_qty > 4000
+
+
 SELECT *
 FROM web_events
 WHERE channel IN ('organic','adwords')
