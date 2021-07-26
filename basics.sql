@@ -1,3 +1,23 @@
+
+
+
+USE sql_store;
+SELECT *
+FROM customers
+ORDER BY points DESC
+LIMIT 3
+
+USE sql_store;
+SELECT *, quantity * unit_price AS total
+FROM order_items
+WHERE order_id = 2
+ORDER BY total DESC
+
+USE sql_store;
+SELECT *
+FROM orders
+WHERE shipped_date IS NULL
+
 USE sql_store;
 SELECT *
 FROM customers
