@@ -1,3 +1,72 @@
+USE sql_store;
+SELECT o.order_date,
+	o.order_id,
+	c.first_name,
+    s.name shipper,
+    os.name status
+FROM orders o
+ JOIN customers c USING (customer_id)
+LEFT JOIN shippers s USING (shipper_id)
+LEFT JOIN order_statuses os
+	ON o.status = os.order_status_id
+
+ORDER BY status
+
+
+USE sql_store;
+SELECT p.product_id,
+	p.name product_name,
+	oi.quantity
+FROM products p
+LEFT JOIN order_items oi
+	USING(product_id)
+ORDER BY product_id
+
+USE sql_invoicing;
+SELECT p.payment_id,
+	c.name client_name,
+    pm.name method
+FROM payments p
+JOIN clients c USING (client_id)
+JOIN payment_methods pm
+	ON  p.payment_method = pm.payment_method_id
+
+
+USE sql_store;
+SELECT o.order_id,
+	o.order_date,
+    c.first_name,
+	c.last_name,
+    os.name status
+FROM orders o
+JOIN customers c USING(customer_id)
+
+JOIN order_statuses os ON  o.status = os.order_status_id
+ORDER BY  status, order_id
+
+
+
+USE sql_hr;
+SELECT  man.employee_id,
+	man.first_name,
+    man.last_name,
+    em.first_name
+FROM employees em
+JOIN employees man
+	ON em.employee_id = man.reports_to
+
+
+USE sql_store;
+SELECT  order_id,
+	oi.product_id,
+    p.name product_name,
+	oi.quantity,
+	oi.unit_price
+FROM order_items oi
+JOIN products p
+	USING(product_id)
+
+
 
 SELECT r.name AS region_name,
 	a.name AS account_name,
