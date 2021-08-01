@@ -1,3 +1,136 @@
+5.
+SELECT a.name,
+	DATE_PART('year', occurred_at) mar_year,
+    DATE_PART('month', occurred_at) mar_month,
+	SUM(gloss_amt_usd) gloss
+FROM orders o
+JOIN accounts a
+	ON o.account_id = a.id
+GROUP BY a.name, 2, 3
+HAVING a.name = 'Walmart'
+ORDER BY gloss DESC
+LIMIT 1
+
+
+
+4.
+SELECT DATE_PART('month', occurred_at) mar_month,
+	SUM(total) sales
+FROM orders
+GROUP BY mar_month
+ORDER BY sales DESC
+
+
+
+3.
+SELECT DATE_PART('year', occurred_at) mar_year,
+	SUM(total) sales
+FROM orders
+GROUP BY mar_year
+ORDER BY sales DESC
+
+2.
+SELECT --DATE_PART('year', occurred_at) marton_year,
+DATE_PART('month', occurred_at) marton,
+SUM(total_amt_usd) sales
+FROM orders
+GROUP BY  marton
+ORDER BY sales DESC
+LIMIT 1
+
+
+
+1.
+SELECT DATE_PART('year', occurred_at)AS harm,
+	SUM(total_amt_usd)
+FROM orders
+GROUP BY harm
+ORDER BY 2 DESC
+LIMIT 10
+
+
+
+-------------------------------------------------
+10.
+SELECT we.channel channel_name,
+
+    COUNT(we.channel) count
+FROM accounts a
+JOIN web_events we
+	ON a.id = we.account_id
+GROUP BY we.channel
+ORDER BY count DESC
+LIMIT 1
+
+
+
+
+9.
+
+SELECT a.name,
+	we.channel channel_name,
+	COUNT(we.channel) count
+FROM accounts a
+JOIN web_events we
+	ON a.id = we.account_id
+WHERE we.channel LIKE '%facebook%'
+GROUP BY a.name, we.channel
+
+ORDER BY count DESC
+LIMIT 1
+
+
+8.
+
+SELECT a.name,
+we.channel,
+COUNT(we.channel) freq
+FROM accounts a
+JOIN web_events we
+ON a.id = we.account_id
+WHERE we.channel LIKE '%facebook%'
+GROUP BY a.name, we.channel
+HAVING COUNT(we.channel) > 6
+ORDER BY freq DESC
+
+
+
+7.
+SELECT a.name,
+SUM(total_amt_usd) lowest
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name
+ORDER BY lowest
+LIMIT 1
+
+
+
+6.
+
+SELECT a.name,
+SUM(total_amt_usd) max
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name
+ORDER BY max DESC
+LIMIT 1
+
+
+
+5.
+SELECT a.name,
+SUM(total_amt_usd) spent
+FROM accounts a
+JOIN orders o
+ON a.id = o.account_id
+GROUP BY a.name
+HAVING SUM(total_amt_usd) < 1000
+
+
+
 4.
 SELECT a.name,
 	SUM(total_amt_usd) total_spending
@@ -10,7 +143,7 @@ ORDER BY total_spending
 
 3.
 SELECT a.name,
-	MAX(o.account_id) as orders_count
+	MAX(o.id) as orders_count
 FROM accounts a
 JOIN orders o
 	ON a.id = o.account_id
