@@ -1,3 +1,75 @@
+1.
+SELECT account_id,
+	SUM(total_amt_usd) total_order,
+    CASE
+    	WHEN SUM(total_amt_usd) > 3000 THEN 'Large'
+       ELSE 'Small'
+    END as levels
+FROM orders
+GROUP BY account_id
+ORDER BY account_id
+
+---------------------------------------------------
+
+Write a query to display for each order, the account ID,
+ total amount of the order,
+and the level of the order - ‘Large’ or ’Small’ -
+depending on if the order is $3000 or more,
+or smaller than $3000.
+
+
+
+
+
+
+SELECT id, account_id,
+CASE
+	WHEN standard_qty = 0 OR standard_qty IS NULL THEN 0
+    ELSE standard_amt_usd/standard_qty
+END unit_price
+
+FROM orders
+LIMIT 10;
+
+
+SELECT  id,
+standard_qty,
+	CASE
+    	WHEN standard_qty < 100 THEN 'less 100'
+        ELSE 'not 100'
+    END category
+FROM orders
+LIMIT 10
+
+
+USE sql_store;
+SELECT CONCAT(first_name, ' ', last_name) customer,
+	points,
+    CASE
+		WHEN points > 3000 THEN 'Gold'
+        WHEN points BETWEEN 2000 AND 3000 THEN 'Silver'
+        ELSE 'Bronze'
+	END  category
+FROM customers
+ORDER BY points DESC
+
+
+USE sql_store;
+SELECT p.product_id,
+	p.name,
+    COUNT(*) orders,
+    IF(COUNT(*) > 1 , 'Many Times', 'Once' ) frequency
+FROM products p
+JOIN order_items oi USING(product_id)
+JOIN orders o USING(order_id)
+GROUP BY p.product_id, p.name
+ORDER BY 1
+
+
+
+
+
+
 5.
 SELECT a.name,
 	DATE_PART('year', occurred_at) mar_year,
