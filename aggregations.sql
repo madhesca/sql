@@ -1,3 +1,81 @@
+6.
+SELECT sr.name,
+	COUNT(*) total_orders,
+    SUM(total_amt_usd) total_sales,
+   	CASE
+    	WHEN COUNT(*) > 200 OR SUM(total_amt_usd) > 750000 THEN 'top'
+        WHEN COUNT(*) > 150 OR SUM(total_amt_usd) = 500000 THEN 'middle'
+		ELSE 'low'
+END levels
+FROM sales_reps sr
+JOIN accounts a
+	ON sr.id = a.sales_rep_id
+JOIN  orders o
+	ON o.account_id = a.id
+GROUP  BY sr.name
+ORDER BY total_sales DESC
+
+
+5.
+SELECT sr.name,
+	COUNT(*) total_orders,
+    CASE
+    	WHEN COUNT(*) > 200 THEN 'TOP'
+        ELSE 'NOT'
+    END levels
+FROM sales_reps sr
+JOIN accounts a
+	ON sr.id = a.sales_rep_id
+JOIN orders o
+	ON o.account_id = a.id
+GROUP BY sr.name
+ORDER BY total_orders DESC
+
+4.
+SELECT a.name account_name,
+	SUM(total_amt_usd) total_sales,
+    EXTRACT(YEAR FROM o.occurred_at) yr,
+    CASE
+    	WHEN SUM(total_amt_usd) > 200000 THEN 'top'
+        WHEN SUM(total_amt_usd) BETWEEN 100000 AND 200000 THEN 'middle'
+        ELSE 'low'
+   END levels
+
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+
+GROUP BY a.name, o.occurred_at
+ORDER BY total_sales DESC
+
+
+3.
+
+SELECT a.name account_name,
+	SUM(total_amt_usd) total_sales,
+    CASE
+    	WHEN SUM(total_amt_usd) > 200000 THEN'top'
+        WHEN SUM(total_amt_usd) BETWEEN 100000 AND 200000 THEN 'medium'
+        ELSE 'low'
+END levels
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+GROUP BY a.name
+ORDER BY total_sales DESC
+
+2.
+SELECT id,
+	total,
+    CASE
+    	WHEN total  > 2000  THEN 'At Least 2000'
+        WHEN total BETWEEN 1000 AND 2000 THEN 'Between 1000 and 2000'
+        ELSE 'LEss than 1000'
+END category
+FROM orders
+ORDER BY total DESC
+
+
 1.
 SELECT account_id,
 	SUM(total_amt_usd) total_order,
