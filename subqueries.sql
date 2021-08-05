@@ -1,5 +1,81 @@
 USE sql_invoicing;
 
+SELECT c.client_id,
+		c.name,
+        (
+        SELECT SUM(invoice_total)
+        FROM invoices
+        WHERE client_id = c.client_id
+        ) total_sales,
+        (
+        SELECT AVG(invoice_total) average
+        FROM invoices
+        ) average,
+        (SELECT total_sales - average) difference
+
+FROM clients c
+
+
+
+
+USE sql_hr;
+
+SELECT *
+FROM employees e
+WHERE salary > (
+SELECT AVG(salary)
+FROM employees
+WHERE office_id = e.office_id
+)
+SELECT *
+FROM accounts a
+WHERE EXISTS (
+	SELECT account_id
+  	FROM orders
+  WHERE account_id = a.id
+)
+
+USE sql_invoicing;
+
+SELECT invoice_total,
+	(	SELECT AVG(invoice_total)
+		FROM invoices
+    ) invoice_average,
+
+    (SELECT invoice_total - invoice_average as difference) difference
+FROM invoices
+
+USE sql_invoicing;
+
+SELECT *
+FROM invoices i
+WHERE invoice_total > (
+SELECT AVG(invoice_total)
+FROM invoices
+WHERE client_id = i.client_id
+)
+
+SELECT *
+FROM orders o
+WHERE standard_qty > (
+	SELECT AVG(standard_qty)
+  FROM orders
+  WHERE account_id = o.account_id
+)
+
+USE sql_invoicing;
+
+SELECT *
+FROM clients
+WHERE client_id IN (
+	SELECT client_id
+    FROM invoices
+
+)
+
+
+USE sql_invoicing;
+
 SELECT *
 FROM invoices
 WHERE invoice_total >
