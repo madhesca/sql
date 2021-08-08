@@ -1,3 +1,164 @@
+5.
+SELECT account_name,
+	total_sales,
+    (
+    SELECT avg_sales
+FROM (
+SELECT 'avg' as avg_all,
+	AVG(total_sales) avg_sales
+FROM (
+SELECT a.name account_name,
+	SUM(total_amt_usd) total_sales
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10
+) sub1
+GROUP BY 1
+) sub2
+    )
+
+FROM (
+SELECT a.name account_name,
+	o.total_amt_usd total_sales
+
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+ORDER BY o.total_amt_usd DESC
+LIMIT 10
+) sub1
+GROUP BY 1, 2
+
+
+
+4.
+SELECT channel,
+	COUNT(*) channel_count
+FROM web_events
+WHERE account_id = (
+SELECT sub1.id
+FROM (
+SELECT a.id ,
+	a.name account_name,
+	SUM(total_amt_usd) total_sales
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+GROUP BY 1, 2
+ORDER BY total_sales DESC
+LIMIT 1
+
+) sub1
+)
+GROUP BY 1
+
+3.
+
+SELECT a.name account_name,
+	SUM(total) total_count
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+GROUP BY 1
+HAVING SUM(total) > (
+	SELECT std_total
+FROM (
+
+SELECT DISTINCT a.id, a.name,
+    SUM(o.standard_qty) standard_count,
+  	SUM(o.total) std_total
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+GROUP BY 1, 2
+ORDER BY 3 DESC
+LIMIT 1
+)sub2
+)
+
+
+2.
+SELECT r.name region_name,
+	COUNT(o.total_amt_usd) total_sales
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+JOIN sales_reps sr
+ON sr.id = a.sales_rep_id
+JOIN region r
+ON r.id = sr.region_id
+WHERE r.name = (
+	SELECT region_name AS region_name
+					FROM (
+					SELECT r.name region_name,
+						SUM(total_amt_usd)
+					FROM orders o
+					JOIN accounts a
+						ON o.account_id = a.id
+					JOIN sales_reps sr
+						ON sr.id = a.sales_rep_id
+					JOIN region r
+						ON r.id = sr.region_id
+
+					GROUP BY 1
+					ORDER BY 2 DESC
+					LIMIT 1
+					) sub1
+)
+GROUP BY 1
+
+
+
+1.
+	SELECT sub3.sales_rep,
+		sub2.region_name,
+		sub2.total_sales
+
+	FROM (
+					SELECT sub1.region_name region_name,
+								MAX(sub1.total_amt_usd) total_sales
+					FROM (
+							SELECT sr.name sales_rep,
+								r.name region_name,
+							    o.total_amt_usd
+							FROM accounts a
+							JOIN orders o
+								ON a.id = o.account_id
+							JOIN sales_reps sr
+								ON sr.id = a.sales_rep_id
+							JOIN region r
+								ON r.id = sr.region_id
+					    ) sub1
+
+					GROUP BY 1
+				) sub2
+
+JOIN (
+			SELECT sub1.sales_rep sales_rep,
+				sub1.region_name region_name,
+				MAX(sub1.total_amt_usd) total_sales
+	FROM (
+			SELECT sr.name sales_rep,
+				r.name region_name,
+					o.total_amt_usd
+			FROM accounts a
+			JOIN orders o
+				ON a.id = o.account_id
+			JOIN sales_reps sr
+				ON sr.id = a.sales_rep_id
+			JOIN region r
+				ON r.id = sr.region_id
+			) sub1
+
+	GROUP BY 1, 2
+) sub3
+
+ON sub2.total_sales = sub3.total_sales AND
+	sub2.region_name = sub3.region_name
+----------------------------------------------------
 USE sql_invoicing;
 
 SELECT c.client_id,
@@ -14,6 +175,17 @@ SELECT c.client_id,
         (SELECT total_sales - average) difference
 
 FROM clients c
+
+
+SELECT channel,
+	AVG(event_count) events_avg
+FROM (SELECT DATE_TRUNC('day', occurred_at)event_date,
+	channel,
+    COUNT(*) event_count
+FROM web_events
+GROUP BY 1, 2) event_table
+GROUP BY 1
+ORDER BY 1, 2 DESC
 
 
 
@@ -54,6 +226,8 @@ SELECT AVG(invoice_total)
 FROM invoices
 WHERE client_id = i.client_id
 )
+
+DISTINCT
 
 SELECT *
 FROM orders o
