@@ -1,3 +1,155 @@
+
+6.
+--avg of all orders
+SELECT
+	AVG(total_amt_usd) avg_sales
+FROM (
+	SELECT  o.id,
+	a.name,
+    total_amt_usd
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+ORDER BY total_amt_usd DESC
+) sub1
+
+---- avg per account greater than the invoice_average
+SELECT account_name
+
+FROM (
+	SELECT
+	a.name account_name,
+    AVG(total_amt_usd) avg_sales
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+GROUP BY 1
+ORDER BY a.name DESC
+) sub1
+WHERE avg_sales > (
+	SELECT
+	AVG(total_amt_usd) avg_sales
+FROM (
+	SELECT  o.id,
+	a.name,
+    total_amt_usd
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+ORDER BY total_amt_usd DESC
+) sub1
+)
+
+--final code
+
+
+SELECT
+		AVG(sub2.total_sales)
+FROM (
+	SELECT a.name account_name,
+o.total_amt_usd total_sales
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+WHERE a.name IN (
+	SELECT account_name
+
+FROM (
+	SELECT
+	a.name account_name,
+    AVG(total_amt_usd) avg_sales
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+GROUP BY 1
+ORDER BY a.name DESC
+) sub1
+WHERE avg_sales > (
+	SELECT
+	AVG(total_amt_usd) avg_sales
+FROM (
+	SELECT  o.id,
+	a.name,
+    total_amt_usd
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+ORDER BY total_amt_usd DESC
+) sub1
+)
+)
+ORDER BY total_amt_usd DESC
+
+
+)sub2
+
+--------------------------------------------
+WITH item1 AS (
+	SELECT  o.id,
+	a.name,
+    total_amt_usd
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+ORDER BY total_amt_usd DESC
+),
+
+	item2 AS (
+		SELECT
+		a.name account_name,
+	    AVG(total_amt_usd) avg_sales
+	FROM accounts a
+	JOIN orders o
+		ON a.id = o.account_id
+	GROUP BY 1
+	ORDER BY a.name DESC
+	)
+
+
+SELECT
+		AVG(sub2.total_sales)
+FROM (
+	SELECT a.name account_name,
+o.total_amt_usd total_sales
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+WHERE a.name IN (
+	SELECT account_name
+
+FROM item2
+WHERE avg_sales > (
+	SELECT
+	AVG(total_amt_usd) avg_sales
+FROM item1
+)
+)
+ORDER BY total_amt_usd DESC
+
+
+) sub2
+
+
+-------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 5.
 SELECT account_name,
 	total_sales,
@@ -32,7 +184,46 @@ LIMIT 10
 ) sub1
 GROUP BY 1, 2
 
+-------------------------------
+WITH sub1 AS (
+SELECT a.name account_name,
+	o.total_amt_usd total_sales
 
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+ORDER BY o.total_amt_usd DESC
+LIMIT 10
+),
+ 	sub2 AS (
+	SELECT a.name account_name,
+		SUM(total_amt_usd) total_sales
+	FROM accounts a
+	JOIN orders o
+		ON a.id = o.account_id
+	GROUP BY 1
+	ORDER BY 2 DESC
+	LIMIT 10
+),
+
+sub3 AS (
+SELECT 'avg' as avg_all,
+	AVG(total_sales) avg_sales
+FROM  sub2
+GROUP BY 1
+)
+
+SELECT account_name,
+	total_sales,
+    (
+    SELECT avg_sales
+FROM  sub3
+    )
+
+FROM sub1
+GROUP BY 1, 2
+
+----------------------------------------------------------
 
 4.
 SELECT channel,
@@ -55,17 +246,48 @@ LIMIT 1
 )
 GROUP BY 1
 
-3.
 
-SELECT a.name account_name,
-	SUM(total) total_count
+----------------
+WITH sub1 AS (
+SELECT a.id ,
+	a.name account_name,
+	SUM(total_amt_usd) total_sales
 FROM accounts a
 JOIN orders o
 	ON a.id = o.account_id
+GROUP BY 1, 2
+ORDER BY total_sales DESC
+LIMIT 1
+
+)
+
+SELECT channel,
+	COUNT(*) channel_count
+FROM web_events
+WHERE account_id = (
+SELECT sub1.id
+FROM  sub1
+)
 GROUP BY 1
-HAVING SUM(total) > (
-	SELECT std_total
-FROM (
+---------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3.
+
+WITH sub2 AS (
 
 SELECT DISTINCT a.id, a.name,
     SUM(o.standard_qty) standard_count,
@@ -76,8 +298,30 @@ JOIN orders o
 GROUP BY 1, 2
 ORDER BY 3 DESC
 LIMIT 1
-)sub2
 )
+
+SELECT a.name account_name,
+	SUM(total) total_count
+FROM accounts a
+JOIN orders o
+	ON a.id = o.account_id
+GROUP BY 1
+HAVING SUM(total) > (
+	SELECT std_total
+FROM sub2
+)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 2.
@@ -110,6 +354,51 @@ WHERE r.name = (
 )
 GROUP BY 1
 
+2. WITH
+
+WITH sub1 AS (
+		SELECT r.name region_name,
+			SUM(total_amt_usd)
+		FROM orders o
+		JOIN accounts a
+			ON o.account_id = a.id
+		JOIN sales_reps sr
+			ON sr.id = a.sales_rep_id
+		JOIN region r
+			ON r.id = sr.region_id
+
+		GROUP BY 1
+		ORDER BY 2 DESC
+		LIMIT 1
+)
+
+SELECT r.name region_name,
+	COUNT(o.total_amt_usd) total_sales
+FROM orders o
+JOIN accounts a
+ON o.account_id = a.id
+JOIN sales_reps sr
+ON sr.id = a.sales_rep_id
+JOIN region r
+ON r.id = sr.region_id
+WHERE r.name = (
+	SELECT region_name AS region_name
+					FROM sub1
+)
+GROUP BY 1
+
+
+
+
+
+
+
+
+
+
+--------------------------------------
+--------------------------------------
+--------------------------------------
 
 
 1.
@@ -158,6 +447,65 @@ JOIN (
 
 ON sub2.total_sales = sub3.total_sales AND
 	sub2.region_name = sub3.region_name
+
+
+
+1. with
+
+WITH sub1 AS (
+		SELECT sr.name sales_rep,
+			r.name region_name,
+				o.total_amt_usd
+		FROM accounts a
+		JOIN orders o
+			ON a.id = o.account_id
+		JOIN sales_reps sr
+			ON sr.id = a.sales_rep_id
+		JOIN region r
+			ON r.id = sr.region_id
+		),
+
+		sub2 AS (
+						SELECT sub1.region_name region_name,
+									MAX(sub1.total_amt_usd) total_sales
+						FROM (
+								SELECT sr.name sales_rep,
+									r.name region_name,
+										o.total_amt_usd
+								FROM accounts a
+								JOIN orders o
+									ON a.id = o.account_id
+								JOIN sales_reps sr
+									ON sr.id = a.sales_rep_id
+								JOIN region r
+									ON r.id = sr.region_id
+								) sub1
+
+						GROUP BY 1
+					),
+		sub3 AS (
+				SELECT sub1.sales_rep sales_rep,
+					sub1.region_name region_name,
+					MAX(sub1.total_amt_usd) total_sales
+		FROM sub1
+
+		GROUP BY 1, 2
+		)
+
+
+SELECT sub3.sales_rep,
+	sub2.region_name,
+	sub2.total_sales
+
+FROM sub2
+JOIN sub3
+
+ON sub2.total_sales = sub3.total_sales AND
+sub2.region_name = sub3.region_name
+
+
+----------------------------------------------------
+----------------------------------------------------
 ----------------------------------------------------
 USE sql_invoicing;
 
