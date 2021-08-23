@@ -1,5 +1,26 @@
 
 
+USE sql_store;
+INSERT INTO products(name, quantity_in_stock, unit_price)
+VALUES(
+	'laptop',
+    100,
+    12.50
+),
+(
+'car',
+200,
+15.20
+),
+(
+'house',
+100,
+45.2
+)
+
+
+
+
 
 USE sql_store;
 SELECT *
