@@ -1,5 +1,57 @@
 
 
+
+CREATE TABLE table_name AS (
+	SELECT *
+	FROM orders
+
+)
+USE sql_invoicing;
+
+UPDATE invoices
+SET payment_total = invoice_total * 5 , payment_date = due_date
+WHERE invoice_id = 3
+
+USE sql_invoicing;
+
+UPDATE invoices
+SET payment_total = invoice_total * 5 , payment_date = due_date
+
+
+USE sql_store;
+
+UPDATE customers
+SET points = points + 500000000
+WHERE birth_date < '1990-01-01'
+
+
+INSERT INTO orders_archived
+SELECT *
+FROM orders
+WHERE order_date < '2019-01-01'
+
+USE sql_invoicing;
+
+CREATE TABLE invoice_archived AS (
+SELECT i.client_id,
+	c.name AS client_name
+FROM invoices i
+JOIN clients c
+USING(client_id)
+WHERE payment_date IS NOT NULL )
+
+
+
+
+USE sql_store;
+INSERT INTO orders (customer_id, order_date, status)
+VALUE(12, '1988-03-24', 1);
+
+INSERT INTO order_items
+VALUES(LAST_INSERT_ID(), 17, 5, 2.5),
+	(LAST_INSERT_ID(), 16, 5, 3.5)
+
+
 USE sql_store;
 INSERT INTO products(name, quantity_in_stock, unit_price)
 VALUES(
