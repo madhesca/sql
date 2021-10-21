@@ -1,4 +1,4 @@
-
+sample data addtional
 
 
 CREATE TABLE table_name AS (
