@@ -1,3 +1,62 @@
+select *
+from accounts
+where (name LIKE 'C%' or name LIKE 'W%')
+and (primary_poc LIKE '%ana%' or primary_poc LIKE '%Ana%')
+and primary_poc NOT like '%eana%'
+
+
+select *
+from orders
+where standard_qty = 0 and (gloss_qty > 1000 or poster_qty > 1000)
+
+
+select id
+from orders
+where gloss_qty > 4000 or poster_qty > 4000
+limit 100
+
+
+
+select *
+from web_events
+ where channel IN ('organic', 'adwords') and occurred_at  between '2016-01-01' and '2016-12-31'
+ order by occurred_at
+
+select order_date, gloss_qty
+from orders
+where gloss_qty BETWEEN 24 and 29
+
+select *
+from accounts
+where name NOT  LIKE 'C%' and '%s'
+
+select *
+from orders
+where standard_qty > 1000 and poster_qty = 0 and gloss_qty = 0
+limit 100
+
+
+select name, primary_poc, sales_rep_id
+from accounts
+where  name NOT IN ('Walmart', 'Target', 'Nordstrom')
+
+select id,
+	account_id,
+	(poster_amt_usd / (standard_amt_usd + gloss_amt_usd + poster_amt_usd) ) *100 poster_percentage
+from orders
+limit 10
+
+
+
+select id,
+	account_id,
+	standard_amt_usd / standard_qty
+from orders
+limit 10
+
+
+
+
 
 
 
@@ -40,7 +99,14 @@ JOIN clients c
 USING(client_id)
 WHERE payment_date IS NOT NULL )
 
+USE sql_store;
 
+DELETE FROM customers
+WHERE customer_id = (
+
+SELECT order_id
+FROM orders
+WHERE order_date = '2018-04-22' )
 
 
 USE sql_store;

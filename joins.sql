@@ -1,3 +1,12 @@
+select standard_qty, gloss_qty, poster_qty,
+	website, primary_poc
+from orders o
+join accounts a
+on o.account_id = a.id
+limit 100
+
+
+
 USE sql_store;
 SELECT c.state,
 	c.customer_id,
