@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 select *
 from accounts
 where (name LIKE 'C%' or name LIKE 'W%')
@@ -58,6 +59,9 @@ limit 10
 
 
 
+=======
+sample data addtional
+>>>>>>> 7198eb507a46603b6c920662e0e0afe6e353d37a
 
 
 CREATE TABLE table_name AS (
