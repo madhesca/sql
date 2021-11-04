@@ -1,3 +1,78 @@
+3.
+select r.name region_name,
+	sr.name sales_name,
+	a.name account_name
+from accounts a
+join sales_reps sr
+	on a.sales_rep_id = sr.id
+join region r
+	on sr.region_id = r.id
+where sr.name LIKE '% K%' and r.name = 'Midwest'
+order by 3
+
+
+2.
+select  r.name region_name,
+	sr.name sales_rep,
+	a.name account_name
+from accounts a
+join sales_reps sr
+	on a.sales_rep_id = sr.id
+join region r
+	on r.id = sr.region_id
+
+where sr.name LIKE 'S%' AND
+	r.name = 'Midwest'
+order by a.name
+
+1.
+select r.name region_name,
+	sr.name sales_rep,
+	a.name account_name
+from accounts a
+join sales_reps sr
+on a.sales_rep_id = sr.id
+join region r
+on sr.region_id = r.id
+
+order by 3
+limit 100
+
+
+
+select  r.name region,
+	a.name account_name,
+	o.total_amt_usd / (o.total / 0.01) unit_price
+from accounts a
+join orders o
+on a.id = o.account_id
+join sales_reps sr
+on sr.id = a.sales_rep_id
+join region r
+on r.id = sr.region_id
+limit 100
+
+
+select a.name accounts, r.name region,
+sr.name sales_rep
+from accounts a
+join sales_reps sr
+on a.sales_rep_id = sr.id
+join region r
+on sr.region_id = r.id
+order by 1
+limit 100
+
+
+select a.name,
+a.primary_poc,
+we.occurred_at, we.channel
+from accounts a
+join web_events we
+on a.id = we.account_id
+where a.name = 'Walmart'
+limit 100
+
 select standard_qty, gloss_qty, poster_qty,
 	website, primary_poc
 from orders o
