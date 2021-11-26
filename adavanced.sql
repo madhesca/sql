@@ -1,3 +1,18 @@
+SELECT *
+from orders
+
+
+
+
+
+
+
+
+
+
+
+
+
 SELECT accounts.name as account_name,
        accounts.primary_poc as poc_name,
        sales_reps.name as sales_rep_name
